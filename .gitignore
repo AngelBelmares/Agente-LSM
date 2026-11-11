@@ -1,0 +1,6 @@
+.venv/
+dataset/
+dataset_completo/
+*.h5
+*.pickle
+__pycache__/
