@@ -56,7 +56,10 @@ def main():
     parser.add_argument("--camara", type=int, default=0)
     parser.add_argument("--video", help="usar un archivo de video en vez de la webcam")
     parser.add_argument("--umbral", type=float, default=0.6, help="confianza mínima para aceptar una letra")
-    parser.add_argument("--sostener", type=float, default=1.0, help="segundos que hay que sostener una seña para escribirla")
+    parser.add_argument("--sostener", type=float, default=1.0,
+                        help="segundos que hay que sostener una seña estática para escribirla")
+    parser.add_argument("--sostener-dinamica", type=float, default=0.3,
+                        help="segundos para letras con movimiento (J K Ñ Q X Z), que duran poco")
     parser.add_argument("--sin-espejo", action="store_true", help="no voltear la imagen en pantalla")
     parser.add_argument("--sin-ventana", action="store_true", help="no abrir ventana; imprime las letras (pruebas)")
     args = parser.parse_args()
@@ -114,8 +117,12 @@ def main():
                 if puntos is not None or buffer:
                     buffer.append(lc.canonizar(puntos, izquierda) if puntos is not None
                                   else np.full((lc.N_PUNTOS, 3), np.nan, np.float32))
-                if len(buffer) == lc.PASOS and puntos is not None:
-                    x = lc.caracteristicas(np.stack(buffer)[None])
+                if len(buffer) >= lc.PASOS // 2 and puntos is not None:
+                    # Con medio segundo basta: se rellena el inicio repitiendo la primera
+                    # pose, igual que las ventanas cortas del entrenamiento.
+                    pasos = list(buffer)
+                    pasos = [pasos[0]] * (lc.PASOS - len(pasos)) + pasos
+                    x = lc.caracteristicas(np.stack(pasos)[None])
                     historial.append(modelo(x, training=False).numpy()[0])
                     prob = np.mean(historial, axis=0)
                     orden = np.argsort(prob)[::-1][:3]
@@ -125,7 +132,8 @@ def main():
                         estado, color = f"Seña: {letra}  ({confianza * 100:.0f}%)", VERDE
                         if letra != letra_estable:
                             letra_estable, estable_desde, ya_escrita = letra, t, False
-                        elif not ya_escrita and t - estable_desde >= args.sostener:
+                        elif not ya_escrita and t - estable_desde >= (
+                                args.sostener_dinamica if letra in lc.LETRAS_DINAMICAS else args.sostener):
                             texto += letra
                             ya_escrita = True
                             if args.sin_ventana:
@@ -133,7 +141,7 @@ def main():
                     else:
                         estado, color = "Buscando seña...", NARANJA
                         letra_estable = None
-                elif puntos is not None and len(buffer) < lc.PASOS:
+                elif puntos is not None and len(buffer) < lc.PASOS // 2:
                     estado, color = "Detectando mano...", NARANJA
 
             if args.sin_ventana:

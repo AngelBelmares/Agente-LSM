@@ -57,7 +57,7 @@ python entrenar_modelo.py              # entrena -> modelos/modelo_lsm.keras
 python app_completo.py                 # webcam
 ```
 
-- App: `--camara 1` usa otra cámara, `--umbral 0.6` fija la confianza mínima, `--sostener 1.0` los segundos para escribir una letra y `--video archivo.mp4` prueba con un video.
+- App: `--camara 1` usa otra cámara, `--umbral 0.6` fija la confianza mínima, `--sostener 1.0` los segundos para escribir una letra estática, `--sostener-dinamica 0.3` lo mismo para J K Ñ Q X Z y `--video archivo.mp4` prueba con un video.
 - Teclas: `q`/`Esc` salir, `Espacio` espacio, `Retroceso` borrar, `c` limpiar.
 - `--origen` acepta carpetas y `.7z`/`.zip`/`.tar`, uno o varios: `python preprocesar_dataset.py --origen a.7z carpeta_b`. Los comprimidos se leen con el `tar` de Windows, sin extraerlos. En carpetas se buscan todas las subcarpetas `train/` y `test/`. En imágenes, la letra sale de la carpeta. En videos sale del nombre (`S<id>-<Letra>-<Vista>-<Rep>`) o, si no se puede, de la carpeta.
 - Al terminar, `entrenar_modelo.py` muestra la exactitud sobre las personas del set `test` (no vistas en entrenamiento) y la confusión principal de cada letra.
