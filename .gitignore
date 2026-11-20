@@ -1,6 +1,16 @@
 .venv/
 dataset/
 dataset_completo/
+dataset_tmp/
+datos/
+# Se versiona el modelo entrenado para poder usar la app sin entrenar.
+modelos/*
+!modelos/modelo_lsm.keras
+!modelos/clases.json
 *.h5
+*.task
+*.7z
 *.pickle
+*.log
 __pycache__/
+*.stackdump

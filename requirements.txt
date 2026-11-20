@@ -1,0 +1,6 @@
+# Python 3.12 (TensorFlow aún no tiene ruedas para versiones más nuevas en Windows).
+tensorflow==2.21.0
+mediapipe==1.2.3   # instala opencv-contrib-python; no instales también opencv-python
+numpy
+pillow
+# Los .7z del dataset se leen con `tar`, que ya viene en Windows 10/11.
